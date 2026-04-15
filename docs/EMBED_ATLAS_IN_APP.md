@@ -17,6 +17,8 @@ Assume you were given:
 
 - `textengine-msdf-runtime-macos-arm64-v1.zip`
 
+- https://github.com/jvcleave/MSDFTextEngineTool/releases/download/1.0/textengine-msdf-runtime-macos-arm64-v1.zip
+
 ### 1) Put Runtime Files In Your App Repo
 
 Extract it into your project, for example:
