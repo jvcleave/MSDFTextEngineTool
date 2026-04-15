@@ -34,6 +34,7 @@ final class AppState
     var pixelRange: Double = 4
     var padding: Int = 8
     var yOrigin: String = "top"
+    var exportRawGeneratorJSON: Bool = false
 
     // Step 4 — Example
     var demoText: String = "HELLO"
@@ -206,6 +207,26 @@ final class AppState
             logLines.append("✓ \(bundle.loadedConfig.atlasImageURL.lastPathComponent)")
             logLines.append("✓ \(bundle.loadedConfig.runtimeMetadataURL.lastPathComponent)")
             logLines.append("✓ \(bundle.loadedConfig.charsetManifestURL.lastPathComponent)")
+
+            if exportRawGeneratorJSON
+            {
+                logLines.append("✓ \(bundle.loadedConfig.metadataURL.lastPathComponent)")
+            }
+            else if FileManager.default.fileExists(atPath: bundle.loadedConfig.metadataURL.path)
+            {
+                do
+                {
+                    try FileManager.default.removeItem(at: bundle.loadedConfig.metadataURL)
+                    logLines.append("Removed raw generator JSON (runtime JSON kept).")
+                }
+                catch
+                {
+                    logLines.append(
+                        "Warning: Failed to remove raw generator JSON: \(bundle.loadedConfig.metadataURL.lastPathComponent)"
+                    )
+                }
+            }
+
             lastExportOutputDirectoryURL = bundle.loadedConfig.outputDirectoryURL
 
             do

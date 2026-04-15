@@ -43,7 +43,7 @@ Export output folder contains:
 - `{projectName}-atlas.bmp`
 - `{projectName}-atlas-runtime.json`
 - `{projectName}-charset.txt`
-- `{projectName}-atlas.json` (raw generator metadata; debug/reference)
+- `{projectName}-atlas.json` only when **Advanced > Export raw generator JSON** is enabled (debug/reference)
 
 ### Step 4: Example
 

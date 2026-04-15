@@ -9,7 +9,7 @@ Per export folder (`{projectName}`), the tool writes:
 - `{projectName}-atlas.bmp`
 - `{projectName}-atlas-runtime.json`
 - `{projectName}-charset.txt`
-- `{projectName}-atlas.json` (raw generator metadata)
+- `{projectName}-atlas.json` (raw generator metadata; optional in TextEngineToolApp via Advanced toggle, always available in CLI flow)
 
 `*-atlas-runtime.json` is the primary runtime contract.
 
@@ -153,4 +153,3 @@ Runtime guidance:
 3. Build `unicode -> glyph` map from `glyphs`.
 4. (Optional) Build kerning map from `kerning`.
 5. Generate quads from glyph bounds and draw with MSDF shader decode.
-

@@ -151,6 +151,8 @@ struct ExportView: View
                             .pickerStyle(.segmented)
                             .frame(width: 180)
                         }
+
+                        Toggle("Export raw generator JSON", isOn: $state.exportRawGeneratorJSON)
                     }
                 }
             }
