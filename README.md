@@ -7,6 +7,15 @@ It contains:
 - a macOS app (`TextEngineToolApp`) for user-facing export/preview flow
 - vendored `msdf-atlas-gen` integration
 
+## Table Of Contents
+
+- [Repo Overview](#repo-overview)
+- [Documentation](#documentation)
+- [Required Dependencies](#required-dependencies)
+- [Quick Start (App)](#quick-start-app)
+- [TextEngineExampleApp](#textengineexampleapp)
+- [CLI Usage](#cli-usage)
+
 ## Repo Overview
 
 - `Sources/TextEngineTool`: CLI entry point
@@ -16,13 +25,15 @@ It contains:
 - `Vendor/msdf-atlas-gen`: pinned vendored upstream source
 - `Generated`: local export outputs (repo/dev workflow)
 
-## Primary Docs
+## Documentation
 
-- CLI workflow: [CLI_GUIDE.md](CLI_GUIDE.md)
+- CLI workflow: [docs/CLI_GUIDE.md](docs/CLI_GUIDE.md)
 - App workflow: [Apps/USER_GUIDE_APP.md](Apps/USER_GUIDE_APP.md)
-- Exported file contract: [EXPORTED_DATA_TYPES.md](EXPORTED_DATA_TYPES.md)
-- Vendor pin/license notes: [VENDOR.md](VENDOR.md)
-- Potential future work: [POTENTIAL_TODO.md](POTENTIAL_TODO.md)
+- Exported file contract: [docs/EXPORTED_DATA_TYPES.md](docs/EXPORTED_DATA_TYPES.md)
+- Embed atlas generation in another app: [docs/EMBED_ATLAS_IN_APP.md](docs/EMBED_ATLAS_IN_APP.md)
+- Script inventory: [docs/AVAILABLE_SCRIPTS.md](docs/AVAILABLE_SCRIPTS.md)
+- Vendor pin/license notes: [docs/VENDOR.md](docs/VENDOR.md)
+- Potential future work: [docs/POTENTIAL_TODO.md](docs/POTENTIAL_TODO.md)
 
 ## Required Dependencies
 
@@ -70,7 +81,7 @@ Open:
 
 ## CLI Usage
 
-For CLI commands and workflows, see [CLI_GUIDE.md](CLI_GUIDE.md).
+For CLI commands and workflows, see [docs/CLI_GUIDE.md](docs/CLI_GUIDE.md).
 
 
 
@@ -85,9 +96,6 @@ For CLI commands and workflows, see [CLI_GUIDE.md](CLI_GUIDE.md).
 <img width="1148" height="1172" alt="image" src="https://github.com/user-attachments/assets/e297554f-d178-4287-a239-a6aed163c815" />
 
 <img width="1143" height="1171" alt="image" src="https://github.com/user-attachments/assets/a7233770-0b22-4f7e-abfe-37978a0606f4" />
-
-
-
 
 
 

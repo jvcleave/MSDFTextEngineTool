@@ -3,6 +3,8 @@ import Foundation
 public struct VendoredMSDFAtlasGen
 {
     public let rootDirectoryURL: URL
+    public let preferredBinaryURL: URL?
+    public let canAutoBuild: Bool
 
     private var vendorDirectoryURL: URL
     {
@@ -14,27 +16,45 @@ public struct VendoredMSDFAtlasGen
         rootDirectoryURL.appendingPathComponent(".vendor-build/msdf-atlas-gen")
     }
 
-    public init(rootDirectoryURL: URL)
+    public init(
+        rootDirectoryURL: URL,
+        preferredBinaryURL: URL? = nil,
+        canAutoBuild: Bool = true
+    )
     {
         self.rootDirectoryURL = rootDirectoryURL
+        self.preferredBinaryURL = preferredBinaryURL
+        self.canAutoBuild = canAutoBuild
     }
 
     public var isBuilt: Bool
     {
-        builtBinaryURL() != nil
+        existingBinaryURL() != nil
     }
 
     func ensureBuilt() throws -> URL
     {
+        if let existingBinaryURL = existingBinaryURL()
+        {
+            return existingBinaryURL
+        }
+
+        guard canAutoBuild
+        else
+        {
+            throw ToolError(
+                """
+                msdf-atlas-gen binary was not found.
+                Expected bundled binary at:
+                  \(Self.bundledBinaryCandidates().map(\.path).joined(separator: "\n  "))
+                """
+            )
+        }
+
         guard FileManager.default.fileExists(atPath: vendorDirectoryURL.path)
         else
         {
             throw ToolError("Vendored msdf-atlas-gen was not found at \(vendorDirectoryURL.path)")
-        }
-
-        if let existingBinaryURL = builtBinaryURL()
-        {
-            return existingBinaryURL
         }
 
         try FileManager.default.createDirectory(
@@ -82,16 +102,28 @@ public struct VendoredMSDFAtlasGen
 
     public func ensureBuiltStreaming(onLine: @escaping @Sendable (String) -> Void) async throws -> URL
     {
+        if let existingBinaryURL = existingBinaryURL()
+        {
+            onLine("msdf-atlas-gen binary ready at \(existingBinaryURL.path)")
+            return existingBinaryURL
+        }
+
+        guard canAutoBuild
+        else
+        {
+            throw ToolError(
+                """
+                msdf-atlas-gen binary was not found.
+                Expected bundled binary at:
+                  \(Self.bundledBinaryCandidates().map(\.path).joined(separator: "\n  "))
+                """
+            )
+        }
+
         guard FileManager.default.fileExists(atPath: vendorDirectoryURL.path)
         else
         {
             throw ToolError("Vendored msdf-atlas-gen was not found at \(vendorDirectoryURL.path)")
-        }
-
-        if let existingBinaryURL = builtBinaryURL()
-        {
-            onLine("msdf-atlas-gen binary already built at \(existingBinaryURL.path)")
-            return existingBinaryURL
         }
 
         try FileManager.default.createDirectory(
@@ -196,6 +228,50 @@ public struct VendoredMSDFAtlasGen
             ],
             currentDirectoryURL: rootDirectoryURL
         )
+    }
+
+    public static func defaultBundledBinaryURL() -> URL?
+    {
+        for candidateURL in bundledBinaryCandidates()
+        {
+            if FileManager.default.fileExists(atPath: candidateURL.path)
+            {
+                return candidateURL
+            }
+        }
+
+        return nil
+    }
+
+    public static func bundledBinaryCandidates() -> [URL]
+    {
+        guard let resourceDirectoryURL = Bundle.main.resourceURL
+        else
+        {
+            return []
+        }
+
+        return [
+            resourceDirectoryURL.appendingPathComponent("bin/msdf-atlas-gen"),
+            resourceDirectoryURL.appendingPathComponent("msdf-atlas-gen"),
+            resourceDirectoryURL.appendingPathComponent("msdf-atlas-gen/bin/msdf-atlas-gen"),
+        ]
+    }
+
+    private func existingBinaryURL() -> URL?
+    {
+        if let preferredBinaryURL,
+           FileManager.default.fileExists(atPath: preferredBinaryURL.path)
+        {
+            return preferredBinaryURL
+        }
+
+        if let bundledBinaryURL = Self.defaultBundledBinaryURL()
+        {
+            return bundledBinaryURL
+        }
+
+        return builtBinaryURL()
     }
 
     private func builtBinaryURL() -> URL?
