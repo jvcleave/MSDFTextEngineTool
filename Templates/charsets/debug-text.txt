@@ -1,0 +1,8 @@
+# Debug text charset
+# Printable ASCII without newline. Newline is handled by filter layout.
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz
+0123456789
+<SPACE>
+!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~

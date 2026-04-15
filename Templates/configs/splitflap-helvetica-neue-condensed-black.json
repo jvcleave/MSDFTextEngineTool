@@ -1,0 +1,18 @@
+{
+  "atlasHeight": 1024,
+  "atlasImageName": "atlas.bmp",
+  "atlasWidth": 1024,
+  "charsetManifestName": "charset.txt",
+  "charsetPath": "../charsets/splitflap.txt",
+  "fontPath": "/System/Library/Fonts/HelveticaNeue.ttc",
+  "fontPostScriptName": "HelveticaNeue-CondensedBlack",
+  "imageFormat": "bmp",
+  "imageType": "msdf",
+  "metadataFileName": "atlas.json",
+  "outputDirectory": "../../Generated/SplitFlap",
+  "padding": 8,
+  "pixelRange": 4,
+  "runtimeMetadataFileName": "atlas-runtime.json",
+  "emSize": 64,
+  "yOrigin": "top"
+}

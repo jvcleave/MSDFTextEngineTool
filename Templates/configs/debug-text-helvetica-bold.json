@@ -1,0 +1,18 @@
+{
+  "atlasHeight": 1024,
+  "atlasImageName": "debug-text-atlas.bmp",
+  "atlasWidth": 1024,
+  "charsetManifestName": "debug-text-charset.txt",
+  "charsetPath": "../charsets/debug-text.txt",
+  "fontPath": "/System/Library/Fonts/Helvetica.ttc",
+  "fontPostScriptName": "Helvetica-Bold",
+  "imageFormat": "bmp",
+  "imageType": "msdf",
+  "metadataFileName": "debug-text-atlas.json",
+  "outputDirectory": "../../Generated/DebugText",
+  "padding": 8,
+  "pixelRange": 4,
+  "runtimeMetadataFileName": "debug-text-atlas-runtime.json",
+  "emSize": 64,
+  "yOrigin": "top"
+}

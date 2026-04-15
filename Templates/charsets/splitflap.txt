@@ -1,0 +1,7 @@
+# SplitFlap pilot charset
+# One logical line per entry.
+# Use <SPACE> for the space character.
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+0123456789
+<SPACE>

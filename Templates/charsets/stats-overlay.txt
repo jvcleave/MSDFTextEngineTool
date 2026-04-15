@@ -1,0 +1,10 @@
+# Stats overlay charset
+# Uppercase labels plus the punctuation currently used by StatsOverlayFilter.
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+0123456789
+<SPACE>
+-
+|
+@
+x

@@ -1,0 +1,18 @@
+{
+  "atlasHeight": 1024,
+  "atlasImageName": "stats-overlay-atlas.bmp",
+  "atlasWidth": 1024,
+  "charsetManifestName": "stats-overlay-charset.txt",
+  "charsetPath": "../charsets/stats-overlay.txt",
+  "fontPath": "/System/Library/Fonts/Helvetica.ttc",
+  "fontPostScriptName": "Helvetica-Bold",
+  "imageFormat": "bmp",
+  "imageType": "msdf",
+  "metadataFileName": "stats-overlay-atlas.json",
+  "outputDirectory": "../../Generated/StatsOverlay",
+  "padding": 8,
+  "pixelRange": 4,
+  "runtimeMetadataFileName": "stats-overlay-atlas-runtime.json",
+  "emSize": 64,
+  "yOrigin": "top"
+}

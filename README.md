@@ -1,0 +1,83 @@
+# TextEngineTool
+
+`TextEngineTool` is a repo for generating and validating MSDF text atlases for Metal pipelines.
+
+It contains:
+- a Swift package (`TextEngineTool` CLI + `TextEngineToolCore`)
+- a macOS app (`TextEngineToolApp`) for user-facing export/preview flow
+- vendored `msdf-atlas-gen` integration
+
+## Repo Overview
+
+- `Sources/TextEngineTool`: CLI entry point
+- `Sources/TextEngineToolCore`: shared atlas generation, config, parsing, runtime metadata
+- `Apps/TextEngineToolApp`: macOS app project
+- `Templates/charsets`: reusable charset templates
+- `Vendor/msdf-atlas-gen`: pinned vendored upstream source
+- `Generated`: local export outputs (repo/dev workflow)
+
+## Primary Docs
+
+- CLI workflow: [CLI_GUIDE.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/CLI_GUIDE.md)
+- App workflow: [Apps/USER_GUIDE_APP.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/Apps/USER_GUIDE_APP.md)
+- Exported file contract: [EXPORTED_DATA_TYPES.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/EXPORTED_DATA_TYPES.md)
+- Vendor pin/license notes: [VENDOR.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/VENDOR.md)
+- Potential future work: [POTENTIAL_TODO.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/POTENTIAL_TODO.md)
+
+## Required Dependencies
+
+- Swift toolchain (`swift`) from Xcode or Xcode Command Line Tools
+- `cmake`
+- `freetype` development libraries
+- `libpng` development libraries
+
+`INSTALL_DEPENDENCIES.sh` currently uses Homebrew to install dependencies on macOS. Homebrew is a convenience path, not a hard runtime requirement, if equivalent dependencies are already installed and discoverable by `cmake`.
+
+Check dependencies without installing:
+
+```bash
+./CHECK_DEPENDENCIES.sh
+```
+
+Install and bootstrap supported dependencies:
+
+```bash
+./INSTALL_DEPENDENCIES.sh
+```
+
+## Quick Start (CLI)
+
+```bash
+./CHECK_DEPENDENCIES.sh
+./INSTALL_DEPENDENCIES.sh
+swift run TextEngineTool init-config --output ./atlas-config.json
+swift run TextEngineTool generate-atlas --config ./atlas-config.json
+```
+
+Useful extra commands:
+
+```bash
+swift run TextEngineTool build-vendor
+swift run TextEngineTool print-charset --charset ./Templates/charsets/debug-text.txt
+```
+
+## Quick Start (App)
+
+Open:
+
+`Apps/TextEngineToolApp/TextEngineToolApp/TextEngineToolApp.xcodeproj`
+
+Then use the 4-step app flow (Font, Characters, Export, Example) documented in `Apps/USER_GUIDE_APP.md`.
+
+## TextEngineExampleApp
+
+`TextEngineExampleApp` is a minimal consumer example focused on runtime loading and preview:
+
+- one `LOAD EXPORT` button to pick an exported atlas folder
+- runtime loading via `MSDFAtlasBundleLoader`
+- preview via `MSDFTextPreviewView`
+- simple controls for font size, opacity, foreground color, and background color
+
+Open:
+
+`Apps/TextEngineExampleApp/TextEngineExampleApp.xcodeproj`
