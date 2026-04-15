@@ -15,7 +15,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		03F976702F8CE92E00C2C501 /* TextEngineToolApp */ = {
+		03F976702F8CE92E00C2C501 /* Sources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Sources;
 			sourceTree = "<group>";
@@ -37,7 +37,7 @@
 		03F976652F8CE92E00C2C501 = {
 			isa = PBXGroup;
 			children = (
-				03F976702F8CE92E00C2C501 /* TextEngineToolApp */,
+				03F976702F8CE92E00C2C501 /* Sources */,
 				03F9766F2F8CE92E00C2C501 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -66,7 +66,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				03F976702F8CE92E00C2C501 /* TextEngineToolApp */,
+				03F976702F8CE92E00C2C501 /* Sources */,
 			);
 			name = TextEngineToolApp;
 			packageProductDependencies = (
