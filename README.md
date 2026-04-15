@@ -18,11 +18,11 @@ It contains:
 
 ## Primary Docs
 
-- CLI workflow: [CLI_GUIDE.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/CLI_GUIDE.md)
-- App workflow: [Apps/USER_GUIDE_APP.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/Apps/USER_GUIDE_APP.md)
-- Exported file contract: [EXPORTED_DATA_TYPES.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/EXPORTED_DATA_TYPES.md)
-- Vendor pin/license notes: [VENDOR.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/VENDOR.md)
-- Potential future work: [POTENTIAL_TODO.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/POTENTIAL_TODO.md)
+- CLI workflow: [CLI_GUIDE.md](CLI_GUIDE.md)
+- App workflow: [Apps/USER_GUIDE_APP.md](Apps/USER_GUIDE_APP.md)
+- Exported file contract: [EXPORTED_DATA_TYPES.md](EXPORTED_DATA_TYPES.md)
+- Vendor pin/license notes: [VENDOR.md](VENDOR.md)
+- Potential future work: [POTENTIAL_TODO.md](POTENTIAL_TODO.md)
 
 ## Required Dependencies
 

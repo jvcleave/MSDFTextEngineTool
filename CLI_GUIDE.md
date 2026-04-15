@@ -84,10 +84,10 @@ Generation writes:
 - charset manifest (`*-charset.txt`)
 
 See data contract details in:
-- [EXPORTED_DATA_TYPES.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/EXPORTED_DATA_TYPES.md)
+- [EXPORTED_DATA_TYPES.md](EXPORTED_DATA_TYPES.md)
 
 ## Notes
 
 - The CLI is intended for deterministic, versionable asset generation.
 - Vendored `msdf-atlas-gen` build assumptions are documented in:
-  - [VENDOR.md](/Users/jvcleave/Documents/WORK_IN_PROGRESS/MAC_APPS/TextEngineTool/VENDOR.md)
+  - [VENDOR.md](VENDOR.md)
