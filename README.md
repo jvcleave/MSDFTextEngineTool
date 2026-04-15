@@ -71,3 +71,28 @@ Open:
 ## CLI Usage
 
 For CLI commands and workflows, see [CLI_GUIDE.md](CLI_GUIDE.md).
+
+
+
+<img width="1149" height="1171" alt="image" src="https://github.com/user-attachments/assets/0bee4463-1b59-4381-8235-ab8eea1398db" />
+
+
+
+<img width="1154" height="1167" alt="image" src="https://github.com/user-attachments/assets/72526297-0210-4a59-87ed-9c4e6aa4c21f" />
+
+
+
+<img width="1148" height="1172" alt="image" src="https://github.com/user-attachments/assets/e297554f-d178-4287-a239-a6aed163c815" />
+
+<img width="1143" height="1171" alt="image" src="https://github.com/user-attachments/assets/a7233770-0b22-4f7e-abfe-37978a0606f4" />
+
+
+
+
+
+
+
+
+
+
+
