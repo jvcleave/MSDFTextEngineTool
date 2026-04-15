@@ -126,6 +126,12 @@ final class AppState
         projectName = sanitizedProjectName(from: url)
     }
 
+    func selectInstalledFont(postScriptName: String)
+    {
+        fontInput = .installedFont(postScriptName: postScriptName)
+        projectName = sanitizedName(postScriptName)
+    }
+
     func goToNextStep()
     {
         if canAdvance, currentStep < stepTitles.count - 1
@@ -255,17 +261,19 @@ final class AppState
 
     private func sanitizedProjectName(from url: URL) -> String
     {
-        let stem = url.deletingPathExtension().lastPathComponent
-        let sanitized = stem
+        sanitizedName(url.deletingPathExtension().lastPathComponent)
+    }
+
+    private func sanitizedName(_ string: String) -> String
+    {
+        let sanitized = string
             .unicodeScalars
             .map { CharacterSet.alphanumerics.contains($0) || $0 == "-" || $0 == "_" ? Character($0) : "-" }
             .reduce("") { $0 + String($1) }
 
-        let collapsed = sanitized
+        return sanitized
             .components(separatedBy: "-")
             .filter { !$0.isEmpty }
             .joined(separator: "-")
-
-        return collapsed
     }
 }

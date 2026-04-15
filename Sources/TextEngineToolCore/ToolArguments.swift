@@ -7,6 +7,7 @@ public struct ToolArguments: Equatable
         case buildVendor = "build-vendor"
         case generateAtlas = "generate-atlas"
         case initConfig = "init-config"
+        case listFonts = "list-fonts"
         case printCharset = "print-charset"
         case plan
     }
@@ -14,6 +15,7 @@ public struct ToolArguments: Equatable
     public let command: Command
     public let charsetPath: String?
     public let configPath: String?
+    public let familyName: String?
     public let outputPath: String?
 
     public init(arguments: [String]) throws
@@ -23,6 +25,7 @@ public struct ToolArguments: Equatable
             command = .plan
             charsetPath = nil
             configPath = nil
+            familyName = nil
             outputPath = nil
             return
         }
@@ -39,6 +42,7 @@ public struct ToolArguments: Equatable
                   build-vendor
                   generate-atlas --config <path>
                   init-config --output <path>
+                  list-fonts [--family <name>]
                   print-charset --charset <path>
                 """
             )
@@ -48,6 +52,7 @@ public struct ToolArguments: Equatable
 
         var resolvedCharsetPath: String?
         var resolvedConfigPath: String?
+        var resolvedFamilyName: String?
         var resolvedOutputPath: String?
         var index = 1
 
@@ -75,6 +80,15 @@ public struct ToolArguments: Equatable
                 }
                 resolvedCharsetPath = arguments[index]
 
+            case "--family":
+                index += 1
+                guard index < arguments.count
+                else
+                {
+                    throw ToolError("Missing value for --family")
+                }
+                resolvedFamilyName = arguments[index]
+
             case "--output":
                 index += 1
                 guard index < arguments.count
@@ -93,6 +107,7 @@ public struct ToolArguments: Equatable
 
         charsetPath = resolvedCharsetPath
         configPath = resolvedConfigPath
+        familyName = resolvedFamilyName
         outputPath = resolvedOutputPath
 
         if command == .printCharset && charsetPath == nil

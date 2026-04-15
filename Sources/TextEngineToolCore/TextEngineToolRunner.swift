@@ -1,3 +1,4 @@
+import CoreText
 import Foundation
 
 public struct TextEngineToolRunner
@@ -18,6 +19,7 @@ public struct TextEngineToolRunner
                   build-vendor
                   generate-atlas --config <path>
                   init-config --output <path>
+                  list-fonts [--family <name>]
                   print-charset --charset <path>
 
                 Vendored generator:
@@ -91,6 +93,71 @@ public struct TextEngineToolRunner
             let outputURL = URL(fileURLWithPath: outputPath)
             try configData.write(to: outputURL, options: .atomic)
             print("Wrote sample config to \(outputURL.path)")
+
+        case .listFonts:
+            let descriptors: [CTFontDescriptor]
+
+            if let familyName = arguments.familyName
+            {
+                let queryAttributes = [
+                    kCTFontFamilyNameAttribute as String: familyName,
+                ] as CFDictionary
+                let queryDescriptor = CTFontDescriptorCreateWithAttributes(queryAttributes)
+                descriptors = CTFontDescriptorCreateMatchingFontDescriptors(
+                    queryDescriptor,
+                    nil
+                ) as? [CTFontDescriptor] ?? []
+            }
+            else
+            {
+                let collection = CTFontCollectionCreateFromAvailableFonts(nil)
+                descriptors = CTFontCollectionCreateMatchingFontDescriptors(collection)
+                    as? [CTFontDescriptor] ?? []
+            }
+
+            var familyGroups: [String: [String]] = [:]
+
+            for descriptor in descriptors
+            {
+                guard
+                    let family = CTFontDescriptorCopyAttribute(
+                        descriptor,
+                        kCTFontFamilyNameAttribute
+                    ) as? String,
+                    let postScriptName = CTFontDescriptorCopyAttribute(
+                        descriptor,
+                        kCTFontNameAttribute
+                    ) as? String
+                else
+                {
+                    continue
+                }
+
+                familyGroups[family, default: []].append(postScriptName)
+            }
+
+            if familyGroups.isEmpty
+            {
+                if let familyName = arguments.familyName
+                {
+                    print("No fonts found for family '\(familyName)'.")
+                }
+                else
+                {
+                    print("No fonts found.")
+                }
+            }
+            else
+            {
+                for family in familyGroups.keys.sorted()
+                {
+                    print(family)
+                    for postScriptName in familyGroups[family]!.sorted()
+                    {
+                        print("  \(postScriptName)")
+                    }
+                }
+            }
 
         case .printCharset:
             guard let charsetPath = arguments.charsetPath

@@ -1,3 +1,4 @@
+import CoreText
 import SwiftUI
 import TextEngineToolCore
 import UniformTypeIdentifiers
@@ -32,9 +33,135 @@ private let fontLocations: [FontLocation] = [
     ),
 ]
 
+private struct InstalledFontFamily: Identifiable
+{
+    let name: String
+    let postScriptNames: [String]
+    var id: String { name }
+}
+
+private func loadInstalledFontFamilies() -> [InstalledFontFamily]
+{
+    let collection = CTFontCollectionCreateFromAvailableFonts(nil)
+    let descriptors = CTFontCollectionCreateMatchingFontDescriptors(collection)
+        as? [CTFontDescriptor] ?? []
+    var groups: [String: [String]] = [:]
+
+    for descriptor in descriptors
+    {
+        guard
+            let family = CTFontDescriptorCopyAttribute(
+                descriptor,
+                kCTFontFamilyNameAttribute
+            ) as? String,
+            let psName = CTFontDescriptorCopyAttribute(
+                descriptor,
+                kCTFontNameAttribute
+            ) as? String
+        else { continue }
+
+        groups[family, default: []].append(psName)
+    }
+
+    return groups.keys.sorted().map
+    { family in
+        InstalledFontFamily(name: family, postScriptNames: groups[family]!.sorted())
+    }
+}
+
+private struct InstalledFontPickerSheet: View
+{
+    @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
+    @State private var searchText = ""
+    @State private var families: [InstalledFontFamily] = []
+
+    private var filteredFamilies: [InstalledFontFamily]
+    {
+        guard !searchText.isEmpty else { return families }
+        return families.filter
+        { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    var body: some View
+    {
+        VStack(spacing: 0)
+        {
+            HStack
+            {
+                Text("Installed Fonts")
+                    .font(.headline)
+                Spacer()
+                Button("Cancel") { dismiss() }
+                    .buttonStyle(.borderless)
+            }
+            .padding()
+
+            Divider()
+
+            TextField("Search families…", text: $searchText)
+                .textFieldStyle(.roundedBorder)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+
+            Divider()
+
+            if families.isEmpty
+            {
+                ProgressView("Loading fonts…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            else if filteredFamilies.isEmpty
+            {
+                Text("No families matching \"\(searchText)\"")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            else
+            {
+                List
+                {
+                    ForEach(filteredFamilies)
+                    { family in
+                        Section(family.name)
+                        {
+                            ForEach(family.postScriptNames, id: \.self)
+                            { psName in
+                                Button
+                                {
+                                    appState.selectInstalledFont(postScriptName: psName)
+                                    dismiss()
+                                }
+                                label:
+                                {
+                                    Text(psName)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                }
+                .listStyle(.inset)
+            }
+        }
+        .frame(width: 420, height: 520)
+        .task
+        {
+            let loaded = await Task.detached(priority: .userInitiated)
+            {
+                loadInstalledFontFamilies()
+            }.value
+            families = loaded
+        }
+    }
+}
+
 struct FontPickerView: View
 {
     @Environment(AppState.self) private var appState
+    @State private var showInstalledFontPicker = false
 
     var body: some View
     {
@@ -100,12 +227,27 @@ struct FontPickerView: View
             }
             .frame(maxWidth: 320)
 
-            Button("Browse…")
+            HStack(spacing: 12)
             {
-                pickFont(startingAt: nil)
+                Button("Browse…")
+                {
+                    pickFont(startingAt: nil)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Button("Installed Fonts…")
+                {
+                    showInstalledFontPicker = true
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+        }
+        .sheet(isPresented: $showInstalledFontPicker)
+        {
+            InstalledFontPickerSheet()
+                .environment(appState)
         }
     }
 
@@ -176,6 +318,17 @@ struct FontPickerView: View
                 Button("Browse…")
                 {
                     pickFont(startingAt: nil)
+                }
+                .buttonStyle(.borderless)
+                .font(.caption)
+
+                Text("·")
+                    .foregroundStyle(.tertiary)
+                    .font(.caption)
+
+                Button("Installed…")
+                {
+                    showInstalledFontPicker = true
                 }
                 .buttonStyle(.borderless)
                 .font(.caption)
