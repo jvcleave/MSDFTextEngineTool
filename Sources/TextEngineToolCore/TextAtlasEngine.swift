@@ -20,10 +20,21 @@ public struct ExportedAtlasBundle
 public struct TextAtlasEngine
 {
     public let rootDirectoryURL: URL
+    public let generatorRootDirectoryURL: URL
+    public let generatorBinaryURL: URL?
+    public let allowGeneratorBuild: Bool
 
-    public init(rootDirectoryURL: URL)
+    public init(
+        rootDirectoryURL: URL,
+        generatorRootDirectoryURL: URL? = nil,
+        generatorBinaryURL: URL? = nil,
+        allowGeneratorBuild: Bool = true
+    )
     {
         self.rootDirectoryURL = rootDirectoryURL
+        self.generatorRootDirectoryURL = generatorRootDirectoryURL ?? rootDirectoryURL
+        self.generatorBinaryURL = generatorBinaryURL
+        self.allowGeneratorBuild = allowGeneratorBuild
     }
 
     public func makeLoadedAtlasConfig(
@@ -94,7 +105,9 @@ public struct TextAtlasEngine
         )
 
         let vendoredMSDFAtlasGen = VendoredMSDFAtlasGen(
-            rootDirectoryURL: rootDirectoryURL
+            rootDirectoryURL: generatorRootDirectoryURL,
+            preferredBinaryURL: generatorBinaryURL,
+            canAutoBuild: allowGeneratorBuild
         )
         try vendoredMSDFAtlasGen.generateAtlas(
             loadedConfig: loadedConfig,
@@ -142,7 +155,9 @@ public struct TextAtlasEngine
         )
 
         let vendoredMSDFAtlasGen = VendoredMSDFAtlasGen(
-            rootDirectoryURL: rootDirectoryURL
+            rootDirectoryURL: generatorRootDirectoryURL,
+            preferredBinaryURL: generatorBinaryURL,
+            canAutoBuild: allowGeneratorBuild
         )
         try await vendoredMSDFAtlasGen.generateAtlasStreaming(
             loadedConfig: loadedConfig,

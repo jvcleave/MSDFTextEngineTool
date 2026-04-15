@@ -166,12 +166,10 @@ struct ExportView: View
 
             HStack(spacing: 12)
             {
-                if !appState.vendorIsBuilt
+                if !appState.generatorIsReady
                 {
                     Label(
-                        appState.toolRootDetected
-                            ? "Run `swift run TextEngineTool build-vendor` first"
-                            : "TextEngineTool package root not found",
+                        appState.generatorRequirementMessage,
                         systemImage: "exclamationmark.triangle"
                     )
                     .font(.caption)

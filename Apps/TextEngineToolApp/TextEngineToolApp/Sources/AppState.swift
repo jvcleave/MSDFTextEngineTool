@@ -54,10 +54,37 @@ final class AppState
         return FileManager.default.fileExists(atPath: vendorDir.path) ? url : nil
     }()
 
-    var vendorIsBuilt: Bool
+    private static let fallbackOutputBaseDirectoryURL = FileManager.default
+        .homeDirectoryForCurrentUser
+        .appendingPathComponent("Documents")
+        .appendingPathComponent("TextEngineToolExports")
+
+    private static let runtimeWorkingDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
+
+    var generatorBinaryURL: URL?
     {
-        guard let root = Self.toolRootURL else { return false }
-        return VendoredMSDFAtlasGen(rootDirectoryURL: root).isBuilt
+        VendoredMSDFAtlasGen.defaultBundledBinaryURL()
+    }
+
+    var generatorIsReady: Bool
+    {
+        let runtimeRootURL = Self.toolRootURL ?? Self.runtimeWorkingDirectoryURL
+        let generator = VendoredMSDFAtlasGen(
+            rootDirectoryURL: runtimeRootURL,
+            preferredBinaryURL: generatorBinaryURL,
+            canAutoBuild: Self.toolRootURL != nil
+        )
+        return generator.isBuilt
+    }
+
+    var generatorRequirementMessage: String
+    {
+        if toolRootDetected
+        {
+            return "Generator missing. Run `swift run TextEngineTool build-vendor` or bundle `msdf-atlas-gen` in app resources/bin."
+        }
+
+        return "Bundled generator missing at `Contents/Resources/bin/msdf-atlas-gen`."
     }
 
     var resolvedCharset: String
@@ -83,7 +110,7 @@ final class AppState
             && emSize > 0
             && pixelRange > 0
             && padding >= 0
-            && vendorIsBuilt
+            && generatorIsReady
             && !isWorking
     }
 
@@ -112,12 +139,25 @@ final class AppState
         }
     }
 
-    /// Default output: Generated/{projectName} inside the TextEngineTool root.
+    /// Default output:
+    /// - dev/source-tree mode: TextEngineTool/Generated/{projectName}
+    /// - bundled app mode: ~/Documents/TextEngineToolExports/{projectName}
     var defaultOutputDirectoryURL: URL?
     {
         let name = projectName.trimmingCharacters(in: .whitespaces)
-        guard let root = Self.toolRootURL, !name.isEmpty else { return nil }
-        return root.appendingPathComponent("Generated").appendingPathComponent(name)
+        guard !name.isEmpty else { return nil }
+
+        let baseDirectoryURL: URL
+        if let root = Self.toolRootURL
+        {
+            baseDirectoryURL = root.appendingPathComponent("Generated")
+        }
+        else
+        {
+            baseDirectoryURL = Self.fallbackOutputBaseDirectoryURL
+        }
+
+        return baseDirectoryURL.appendingPathComponent(name)
     }
 
     func selectFontFile(url: URL)
@@ -169,7 +209,14 @@ final class AppState
     func export(to outputDirectoryURL: URL) async
     {
         if isWorking { return }
-        guard let fontInput, let toolRootURL = Self.toolRootURL else { return }
+        guard let fontInput else { return }
+        guard generatorIsReady else
+        {
+            logLines = ["Error: \(generatorRequirementMessage)"]
+            return
+        }
+
+        let runtimeRootURL = Self.toolRootURL ?? Self.runtimeWorkingDirectoryURL
         let charset = resolvedCharset
         guard !charset.isEmpty else { return }
 
@@ -178,7 +225,12 @@ final class AppState
         lastExportOutputDirectoryURL = nil
         lastExportAtlasBundle = nil
 
-        let engine = TextAtlasEngine(rootDirectoryURL: toolRootURL)
+        let engine = TextAtlasEngine(
+            rootDirectoryURL: runtimeRootURL,
+            generatorRootDirectoryURL: runtimeRootURL,
+            generatorBinaryURL: generatorBinaryURL,
+            allowGeneratorBuild: Self.toolRootURL != nil
+        )
         let config = engine.makeAtlasConfig(
             fontInput: fontInput,
             charsetPath: "",
