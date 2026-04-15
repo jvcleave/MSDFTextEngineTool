@@ -190,6 +190,11 @@ struct FontPickerView: View
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .sheet(isPresented: $showInstalledFontPicker)
+        {
+            InstalledFontPickerSheet()
+                .environment(appState)
+        }
     }
 
     @ViewBuilder
@@ -243,11 +248,6 @@ struct FontPickerView: View
                 .buttonStyle(.bordered)
                 .controlSize(.large)
             }
-        }
-        .sheet(isPresented: $showInstalledFontPicker)
-        {
-            InstalledFontPickerSheet()
-                .environment(appState)
         }
     }
 
