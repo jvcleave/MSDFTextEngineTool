@@ -45,21 +45,7 @@ Install and bootstrap supported dependencies:
 ./INSTALL_DEPENDENCIES.sh
 ```
 
-## Quick Start (CLI)
-
-```bash
-./CHECK_DEPENDENCIES.sh
-./INSTALL_DEPENDENCIES.sh
-swift run TextEngineTool init-config --output ./atlas-config.json
-swift run TextEngineTool generate-atlas --config ./atlas-config.json
-```
-
-Useful extra commands:
-
-```bash
-swift run TextEngineTool build-vendor
-swift run TextEngineTool print-charset --charset ./Templates/charsets/debug-text.txt
-```
+The macOS app projects are optional and are not required to generate atlases with the CLI.
 
 ## Quick Start (App)
 
@@ -81,3 +67,7 @@ Then use the 4-step app flow (Font, Characters, Export, Example) documented in `
 Open:
 
 `Apps/TextEngineExampleApp/TextEngineExampleApp.xcodeproj`
+
+## CLI Usage
+
+For CLI commands and workflows, see [CLI_GUIDE.md](CLI_GUIDE.md).
