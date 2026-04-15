@@ -18,8 +18,11 @@ Then load those files in your Metal runtime and render MSDF text quads.
 
 ### Step 1: Font
 
-- Pick a font file (`.ttf`, `.otf`, `.ttc`, `.otc`).
-- The app auto-fills `Project name` from the filename (editable later).
+Choose a font using either path:
+
+**Font file** — click a quick-access location button (`User Fonts`, `System Fonts`, `Library Fonts`) or `Browse…` to pick a `.ttf`, `.otf`, `.ttc`, or `.otc` file. The app auto-fills `Project name` from the filename (editable later).
+
+**Installed font** — click `Installed Fonts…` to open the font picker sheet. Type part of a family name to filter (e.g. `Helvetica`), then click a PostScript name to select it. The app auto-fills `Project name` from the PostScript name (editable later).
 
 ### Step 2: Characters
 
@@ -104,6 +107,6 @@ Reference implementation files in the app:
 
 ## 6. v1 Scope Notes
 
-- v1 is file-font-first in the app workflow.
+- Both font file and installed font selection are supported in the app workflow.
 - BMP output is expected and supported (including app preview).
 - Dependency/bootstrap and packaging follow-ups are tracked in `POTENTIAL_TODO.md`.

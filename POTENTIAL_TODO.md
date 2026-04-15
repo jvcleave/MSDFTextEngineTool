@@ -18,11 +18,6 @@ This file tracks optional or later-phase work that is not required for the curre
 - Replace the external executable path with a framework or static-library-based integration.
 - Reduce machine-specific dependency assumptions.
 
-## Potential later app features
-
-- Support a system font picker in addition to file-based font selection.
-- Model installed-font selection with both a resolved font asset path and an optional PostScript name where needed.
-
 ## Potential SATIN export plan
 
 ### Goal

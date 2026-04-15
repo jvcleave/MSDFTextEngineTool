@@ -43,6 +43,18 @@ Print resolved charset from a charset file:
 swift run TextEngineTool print-charset --charset ./Templates/charsets/debug-text.txt
 ```
 
+List installed fonts (all families):
+
+```bash
+swift run TextEngineTool list-fonts
+```
+
+List installed fonts filtered by family name:
+
+```bash
+swift run TextEngineTool list-fonts --family "Helvetica Neue"
+```
+
 Generate atlas assets:
 
 ```bash
@@ -58,7 +70,7 @@ swift run TextEngineTool init-config --output ./atlas-config.json
 ```
 
 2. Edit config values:
-- `fontPath` or installed font fields
+- `fontPath` or `fontPostScriptName` (use `list-fonts` to find PostScript names for installed fonts)
 - `charsetPath` (or inline charset setup, depending on config shape in use)
 - `outputDirectory`
 - atlas parameters (`atlasImageName`, `emSize`, `pixelRange`, `padding`, etc.)
