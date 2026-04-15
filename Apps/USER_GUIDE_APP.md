@@ -109,4 +109,4 @@ Reference implementation files in the app:
 
 - Both font file and installed font selection are supported in the app workflow.
 - BMP output is expected and supported (including app preview).
-- Dependency/bootstrap and packaging follow-ups are tracked in `POTENTIAL_TODO.md`.
+- Dependency/bootstrap and packaging follow-ups are tracked in `../docs/POTENTIAL_TODO.md`.
