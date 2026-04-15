@@ -30,46 +30,26 @@ Expected contents:
 - `Frameworks/libfreetype.6.dylib`
 - `runtime-manifest.json`
 
-### 2) Add A Run Script Build Phase In Xcode
+### 2) Add Native Xcode Embed Phases (No Run Script Required)
 
 In Xcode:
 
 1. Select your app target.
-2. Open `Build Phases`.
-3. Add `+` -> `New Run Script Phase`.
-4. Name it `Stage TextEngine Runtime`.
-5. Place it near the end of build phases (before app launch is fine for local dev).
-6. Paste this script:
+2. Add `textengine-msdf-runtime-macos-arm64-v1/Resources/bin/msdf-atlas-gen` to your Xcode project (File Inspector -> target membership ON).
+3. Open `Build Phases` and add a `Copy Files` phase:
+4. Set `Destination` to `Resources`.
+5. Set `Subpath` to `bin`.
+6. Add `msdf-atlas-gen` to that phase.
+7. Add `libpng16.16.dylib` and `libfreetype.6.dylib` to your app target:
+8. In `General` -> `Frameworks, Libraries, and Embedded Content`, set each dylib to `Embed & Sign`.
+9. Build and run.
 
-```bash
-set -euo pipefail
-
-RUNTIME_ROOT="${SRCROOT}/ThirdParty/TextEngineRuntime/textengine-msdf-runtime-macos-arm64-v1"
-DEST_BIN_DIR="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/bin"
-DEST_FW_DIR="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
-
-mkdir -p "${DEST_BIN_DIR}" "${DEST_FW_DIR}"
-
-cp -f "${RUNTIME_ROOT}/Resources/bin/msdf-atlas-gen" "${DEST_BIN_DIR}/msdf-atlas-gen"
-cp -f "${RUNTIME_ROOT}/Frameworks/"*.dylib "${DEST_FW_DIR}/"
-chmod 755 "${DEST_BIN_DIR}/msdf-atlas-gen"
-
-# Make sure runtime binary resolves bundled libraries.
-install_name_tool -change /opt/homebrew/opt/libpng/lib/libpng16.16.dylib @rpath/libpng16.16.dylib "${DEST_BIN_DIR}/msdf-atlas-gen" 2>/dev/null || true
-install_name_tool -change /opt/homebrew/opt/freetype/lib/libfreetype.6.dylib @rpath/libfreetype.6.dylib "${DEST_BIN_DIR}/msdf-atlas-gen" 2>/dev/null || true
-
-# Rpath for bundled dylibs.
-if ! otool -l "${DEST_BIN_DIR}/msdf-atlas-gen" | awk '/LC_RPATH/{getline;getline;print $2}' | grep -Fxq "@executable_path/../../Frameworks"; then
-  install_name_tool -add_rpath "@executable_path/../../Frameworks" "${DEST_BIN_DIR}/msdf-atlas-gen"
-fi
-```
-
-Why this phase is needed:
+Why this works without patching in Xcode:
 
 - app bundle output paths (`TARGET_BUILD_DIR`, `Contents/Resources`, `Contents/Frameworks`) change per build/config/archive and must be populated each build
-- runtime files are external artifacts (from the zip), not compiled by Xcode, so Xcode will not place them automatically
-- `msdf-atlas-gen` may need runtime linkage normalization (`@rpath`) to ensure it finds bundled dylibs instead of machine-local paths
-- without this step, builds may succeed but atlas generation can fail at runtime with missing binary or dylib errors
+- runtime files are external artifacts (from the zip), not compiled by Xcode, so explicit embed phases are still required
+- linkage normalization (`@rpath`) should already be done in the provided zip by `package-runtime-bundle.sh`
+- this keeps consumer apps on “copy/embed only” and avoids repeated `install_name_tool` edits during each app build
 
 ### 3) Configure `TextEngineToolCore` To Use Bundled Runtime Only
 
@@ -97,19 +77,17 @@ Your app should ship these runtime assets:
 Important:
 
 - all non-system deps must be copied into `Contents/Frameworks`
-- install names/references must be rewritten to `@rpath/...`
-- `msdf-atlas-gen` must include rpath `@executable_path/../../Frameworks`
+- install names/references should already be rewritten to `@rpath/...` in the runtime zip
+- `msdf-atlas-gen` should already include rpath `@executable_path/../../Frameworks`
 - for local Xcode development, signing these nested files is optional
 
-Reference implementation:
+Producer-side (one-time) runtime preparation:
 
-- runtime staging script used by `TextEngineToolApp`:
-  - `Apps/TextEngineToolApp/TextEngineToolApp/Scripts/stage-msdf-runtime.sh`
+- `Apps/TextEngineToolApp/Scripts/package-runtime-bundle.sh`
 
-If you use that script as a template in your own app target:
+Dev-only fallback (when consuming raw local `.vendor-build` output instead of prepared zip):
 
-- keep `TEXT_ENGINE_MSDF_BINARY` pointed at your built `msdf-atlas-gen`
-- keep script before final app codesign step in build/archive flow
+- `Apps/TextEngineToolApp/TextEngineToolApp/Scripts/stage-msdf-runtime.sh`
 
 ### B) Configure `TextAtlasEngine` For Bundled Runtime Only
 
@@ -214,8 +192,9 @@ Expected:
 
 Use this only when you are producing distributed builds (outside local dev):
 
-- sign bundled dylibs first
-- sign `msdf-atlas-gen` with hardened runtime
+- Xcode usually signs embedded dylibs in `Contents/Frameworks`
+- `msdf-atlas-gen` in `Contents/Resources/bin` may still require explicit signing in some project setups
+- if needed, sign `msdf-atlas-gen` with hardened runtime before final app signing
 - sign app last
 - notarize/staple your app or DMG
 

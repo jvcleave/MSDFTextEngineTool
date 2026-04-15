@@ -93,7 +93,8 @@ Purpose:
   - `Resources/bin/msdf-atlas-gen`
   - `Frameworks/*.dylib`
   - `runtime-manifest.json`
-- Rewrites non-system linkage to `@rpath`.
+- Rewrites non-system linkage to `@rpath` (one-time "patch once" step).
+- Fails if external Homebrew-style absolute linkage remains after patching.
 
 Defaults:
 
@@ -275,4 +276,3 @@ Inputs:
 Typical invocation:
 
 - Invoked by Xcode automatically as a Run Script Build Phase.
-

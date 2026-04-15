@@ -151,6 +151,22 @@ if ! otool -l "${DEST_BINARY}" | awk '/LC_RPATH/{getline;getline;print $2}' | gr
   install_name_tool -add_rpath "${RPATH_VALUE}" "${DEST_BINARY}"
 fi
 
+assert_no_external_paths() {
+  local target="$1"
+  local deps
+  deps="$(otool -L "${target}")"
+  if echo "${deps}" | grep -E '/opt/homebrew|/usr/local/opt' >/dev/null; then
+    echo "error: external package-manager linkage detected in ${target}"
+    echo "${deps}"
+    exit 1
+  fi
+}
+
+assert_no_external_paths "${DEST_BINARY}"
+for dep in "${dest_deps[@]}"; do
+  assert_no_external_paths "${dep}"
+done
+
 binary_sha="$(shasum -a 256 "${DEST_BINARY}" | awk '{print $1}')"
 manifest_path="${BUNDLE_DIR}/runtime-manifest.json"
 
