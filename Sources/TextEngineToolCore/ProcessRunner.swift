@@ -22,6 +22,27 @@ private final class LineBuffer: @unchecked Sendable
     }
 }
 
+private final class EmittedLinesBuffer: @unchecked Sendable
+{
+    private let lock = NSLock()
+    private var lines: [String] = []
+
+    func append(_ line: String)
+    {
+        lock.lock()
+        lines.append(line)
+        lock.unlock()
+    }
+
+    func snapshot() -> String
+    {
+        lock.lock()
+        let joined = lines.joined(separator: "\n")
+        lock.unlock()
+        return joined
+    }
+}
+
 public enum ProcessRunner
 {
     @discardableResult
@@ -89,32 +110,71 @@ public enum ProcessRunner
 
                 let stdoutBuffer = LineBuffer()
                 let stderrBuffer = LineBuffer()
+                let emittedLinesBuffer = EmittedLinesBuffer()
+
+                let emitLine: @Sendable (String) -> Void =
+                { line in
+                    onLine(line)
+                    emittedLinesBuffer.append(line)
+                }
 
                 outputPipe.fileHandleForReading.readabilityHandler =
                 { handle in
                     let data = handle.availableData
                     guard !data.isEmpty else { return }
-                    stdoutBuffer.consume(String(decoding: data, as: UTF8.self), emit: onLine)
+                    stdoutBuffer.consume(String(decoding: data, as: UTF8.self), emit: emitLine)
                 }
 
                 errorPipe.fileHandleForReading.readabilityHandler =
                 { handle in
                     let data = handle.availableData
                     guard !data.isEmpty else { return }
-                    stderrBuffer.consume(String(decoding: data, as: UTF8.self), emit: onLine)
+                    stderrBuffer.consume(String(decoding: data, as: UTF8.self), emit: emitLine)
                 }
 
                 process.terminationHandler =
                 { process in
                     outputPipe.fileHandleForReading.readabilityHandler = nil
                     errorPipe.fileHandleForReading.readabilityHandler = nil
-                    stdoutBuffer.flush(emit: onLine)
-                    stderrBuffer.flush(emit: onLine)
+
+                    let remainingOutputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+                    if !remainingOutputData.isEmpty
+                    {
+                        stdoutBuffer.consume(
+                            String(decoding: remainingOutputData, as: UTF8.self),
+                            emit: emitLine
+                        )
+                    }
+
+                    let remainingErrorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                    if !remainingErrorData.isEmpty
+                    {
+                        stderrBuffer.consume(
+                            String(decoding: remainingErrorData, as: UTF8.self),
+                            emit: emitLine
+                        )
+                    }
+
+                    stdoutBuffer.flush(emit: emitLine)
+                    stderrBuffer.flush(emit: emitLine)
 
                     if process.terminationStatus != 0
                     {
+                        let combinedOutput = emittedLinesBuffer.snapshot()
+
+                        let baseMessage = "Command failed: \(command) \(arguments.joined(separator: " "))"
+                        let message: String
+                        if combinedOutput.isEmpty
+                        {
+                            message = baseMessage
+                        }
+                        else
+                        {
+                            message = "\(baseMessage)\n\(combinedOutput)"
+                        }
+
                         continuation.resume(throwing: ToolError(
-                            "Command failed: \(command) \(arguments.joined(separator: " "))",
+                            message,
                             exitCode: process.terminationStatus
                         ))
                     }

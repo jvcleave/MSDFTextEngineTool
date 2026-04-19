@@ -133,14 +133,20 @@ if ! otool -l "${DEST_BINARY}" | awk '/LC_RPATH/{getline;getline;print $2}' | gr
   install_name_tool -add_rpath "${RPATH_VALUE}" "${DEST_BINARY}"
 fi
 
-SIGNING_IDENTITY="${EXPANDED_CODE_SIGN_IDENTITY:-}"
+SIGNING_IDENTITY="${EXPANDED_CODE_SIGN_IDENTITY:--}"
 
-if [[ -n "${SIGNING_IDENTITY}" && "${SIGNING_IDENTITY}" != "-" ]]; then
-  for dep in "${orig_deps[@]}"; do
-    dep_dest="$(dep_dest_for "${dep}")"
+for dep in "${orig_deps[@]}"; do
+  dep_dest="$(dep_dest_for "${dep}")"
+  if [[ "${SIGNING_IDENTITY}" == "-" ]]; then
+    codesign --force --sign - "${dep_dest}"
+  else
     codesign --force --sign "${SIGNING_IDENTITY}" --timestamp "${dep_dest}"
-  done
+  fi
+done
 
+if [[ "${SIGNING_IDENTITY}" == "-" ]]; then
+  codesign --force --sign - "${DEST_BINARY}"
+else
   # Executable needs hardened runtime for notarization.
   codesign --force --sign "${SIGNING_IDENTITY}" --timestamp --options runtime "${DEST_BINARY}"
 fi
